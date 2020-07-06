@@ -27,7 +27,7 @@ class SubmissionController extends Controller
     public function getSubmissionIndex(Request $request, $status = null)
     {
         $submissions = Submission::with('prompt')->where('status', $status ? ucfirst($status) : 'Pending')->whereNotNull('prompt_id');
-        if($request->get('prompt_category_id')) 
+        if($request->get('prompt_category_id'))
             $submissions->whereHas('prompt', function($query) use ($request) {
                 $query->where('prompt_category_id', $request->get('prompt_category_id'));
             });
@@ -37,7 +37,7 @@ class SubmissionController extends Controller
             'isClaims' => false
         ]);
     }
-    
+
     /**
      * Shows the submission detail page.
      *
@@ -57,8 +57,8 @@ class SubmissionController extends Controller
             'tables' => LootTable::orderBy('name')->pluck('name', 'id'),
             'count' => Submission::where('prompt_id', $submission->prompt_id)->where('status', 'Approved')->where('user_id', $submission->user_id)->count()
         ] : []));
-    }    
-    
+    }
+
     /**
      * Shows the claim index page.
      *
@@ -72,7 +72,7 @@ class SubmissionController extends Controller
             'isClaims' => true
         ]);
     }
-    
+
     /**
      * Shows the claim detail page.
      *
@@ -109,7 +109,7 @@ class SubmissionController extends Controller
         if($action == 'reject' && $service->rejectSubmission($request->only(['staff_comments']) + ['id' => $id], Auth::user())) {
             flash('Submission rejected successfully.')->success();
         }
-        elseif($action == 'approve' && $service->approveSubmission($data + ['id' => $id], Auth::user())) {
+        elseif($action == 'approve' && $service->approveSubmission($request->only(['staff_comments']) + ['id' => $id], Auth::user())) {
             flash('Submission approved successfully.')->success();
         }
         else {
